@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Runner – PTITShare</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green:       #04AA6D;
+            --green-dark:  #059862;
+            --green-light: #e8f8f2;
+            --dark:        #282A35;
+            --gray-bg:     #f6f6f6;
+            --border:      #e0e0e0;
+            --muted:       #6c757d;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--gray-bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══ NAVBAR ══ */
+        .navbar {
+            background: var(--green);
+            height: 52px;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        }
+        .nav-logo {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 19px;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+            letter-spacing: -.5px;
+            white-space: nowrap;
+        }
+        .nav-logo span { color: var(--dark); }
+        .nav-dropdown { position: relative; }
+        .nav-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s;
+        }
+        .nav-dropdown-btn:hover,
+        .nav-dropdown:hover .nav-dropdown-btn { background: rgba(0,0,0,.15); }
+        .nav-dropdown-btn svg { transition: transform .2s; }
+        .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+        .nav-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--dark);
+            border-radius: 0 0 6px 6px;
+            min-width: 140px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.3);
+            z-index: 200;
+        }
+        .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+        .nav-dropdown-menu a {
+            display: block;
+            color: #ccc;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 10px 18px;
+            transition: background .12s, color .12s;
+        }
+        .nav-dropdown-menu a:hover { background: var(--green); color: #fff; }
+        .nav-spacer { flex: 1; }
+        .nav-divider {
+            width: 1px;
+            height: 22px;
+            background: rgba(255,255,255,.35);
+            margin: 0 4px;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            transition: background .15s;
+            white-space: nowrap;
+        }
+        .nav-link:hover { background: rgba(0,0,0,.15); color: #fff; }
+
+        /* ══ PAGE WRAPPER ══ */
+        .page-wrapper {
+            width: 100%;
+            max-width: 900px;
+            margin: 36px auto;
+            padding: 0 24px;
+            flex: 1;
+        }
+
+        /* ══ PAGE HEADER ══ */
+        .page-header {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid var(--green);
+        }
+        .page-header h1 { font-size: 26px; font-weight: 800; color: var(--dark); }
+        .page-header p { color: var(--muted); font-size: 14px; margin-top: 5px; }
+
+        /* ══ CARD ══ */
+        .form-card {
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0,0,0,.05);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .form-card-header {
+            background: #f0f0f0;
+            color: #555;
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            padding: 12px 20px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-card-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ══ FIELD ══ */
+        .field-group { display: flex; flex-direction: column; gap: 6px; }
+        .field-label {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        textarea {
+            width: 100%;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-family: 'Source Code Pro', monospace;
+            font-size: 13px;
+            background: #fff;
+            color: var(--dark);
+            outline: none;
+            resize: vertical;
+            transition: border-color .15s, box-shadow .15s;
+            line-height: 1.6;
+        }
+        textarea:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(4,170,109,.1);
+        }
+        textarea#input-area  { min-height: 80px; }
+        textarea#code-area   { min-height: 320px; }
+
+        /* ══ RUN BUTTON ══ */
+        .btn-run {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 10px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: background .15s, transform .1s;
+        }
+        .btn-run:hover { background: var(--green-dark); transform: translateY(-1px); }
+        .btn-run:active { transform: translateY(0); }
+
+        /* ══ OUTPUT / ERROR ══ */
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        @media (max-width: 640px) { .result-grid { grid-template-columns: 1fr; } }
+
+        .result-block { display: flex; flex-direction: column; }
+        .result-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            padding: 10px 16px;
+            border-radius: 6px 6px 0 0;
+            border: 1px solid var(--border);
+            border-bottom: none;
+        }
+        .result-label.output { background: var(--green-light); color: var(--green-dark); }
+        .result-label.error  { background: #fff4f4; color: #c0392b; }
+
+        .result-pre {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 13px;
+            padding: 14px 16px;
+            border-radius: 0 0 6px 6px;
+            border: 1px solid var(--border);
+            min-height: 80px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.6;
+            flex: 1;
+        }
+        .result-pre.output { background: #fff; color: var(--dark); }
+        .result-pre.error  { background: #fff9f9; color: #c0392b; }
+
+        /* ══ FOOTER ══ */
+        footer {
+            background: var(--dark);
+            color: #888;
+            text-align: center;
+            padding: 18px;
+            font-size: 13px;
+            margin-top: auto;
+        }
+        footer a { color: var(--green); text-decoration: none; }
+
+        @media (max-width: 640px) {
+            .navbar { padding: 0 16px; }
+            .page-wrapper { padding: 0 12px; margin: 20px auto; }
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <a class="nav-logo" href="/blog">PTIT<span>Share</span></a>
+    <div class="nav-dropdown">
+        <div class="nav-dropdown-btn">Khám phá ▾</div>
+        <div class="nav-dropdown-menu">
+            <a href="/blog">Blog</a>
+            <a href="/exam">Exam</a>
+            <a href="/practice">Practice</a>
+        </div>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-divider"></div>
+    <a href="/blog/users/this-user" class="nav-link">Trang cá nhân</a>
+    <a href="/blog/users/rank" class="nav-link">Xếp hạng</a>
+    <a href="/blog/logout" class="nav-link">Đăng xuất</a>
+</nav>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>Code Runner</h1>
+        <p>Viết code, nhập input và nhấn Run để chạy thử.</p>
+    </div>
+
+    <form method="POST" action="/practice/run-code">
+        <div class="form-card">
+            <div class="form-card-header">Editor</div>
+            <div class="form-card-body">
+                <div class="field-group">
+                    <label class="field-label">Ngôn ngữ</label>
+                    <select name="language_type">
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="c++">C++</option>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label for="input-area" class="field-label">Input</label>
+                    <textarea id="input-area" name="input"><%= input || '' %></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="code-area" class="field-label">Code</label>
+                    <textarea id="code-area" name="code"><%= code || '' %></textarea>
+                </div>
+            </div>
+        </div>
+        <div style="margin-bottom: 24px;">
+            <button type="submit" class="btn-run">Run</button>
+        </div>
+    </form>
+
+    <div class="result-grid">
+        <div class="result-block">
+            <div class="result-label output">✓ Output</div>
+            <pre class="result-pre output"><%= output || '' %></pre>
+        </div>
+        <div class="result-block">
+            <div class="result-label error">✕ Error</div>
+            <pre class="result-pre error"><%= error || '' %></pre>
+        </div>
+    </div>
+</div>
+
+<footer>&copy; 2026 PTITShare &mdash; Powered by Express</footer>
+</body>
+</html>

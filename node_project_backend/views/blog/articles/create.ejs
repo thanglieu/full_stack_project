@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo bài viết mới - Blog – PTITShare</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    {{ form.media }}
+    <style>
+        :root {
+            --green:       #04AA6D;
+            --green-dark:  #059862;
+            --green-light: #e8f8f2;
+            --dark:        #282A35;
+            --gray-bg:     #f6f6f6;
+            --border:      #e0e0e0;
+            --muted:       #6c757d;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--gray-bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══ NAVBAR PTITSHARE MẶC ĐỊNH ══ */
+        .navbar {
+            background: var(--green);
+            height: 52px;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        }
+        .nav-logo {
+            font-size: 19px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+            letter-spacing: -.5px;
+            white-space: nowrap;
+        }
+        .nav-logo span { color: var(--dark); }
+
+        .nav-dropdown { position: relative; }
+        .nav-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s;
+        }
+        .nav-dropdown-btn:hover,
+        .nav-dropdown:hover .nav-dropdown-btn { background: rgba(0,0,0,.15); }
+        .nav-dropdown-btn svg { transition: transform .2s; }
+        .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+
+        .nav-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--dark);
+            border-radius: 0 0 6px 6px;
+            min-width: 140px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.3);
+            z-index: 200;
+        }
+        .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+        .nav-dropdown-menu a {
+            display: block;
+            color: #ccc;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 10px 18px;
+            transition: background .12s, color .12s;
+        }
+        .nav-dropdown-menu a:hover { background: var(--green); color: #fff; }
+
+        .nav-spacer { flex: 1; }
+        .nav-divider {
+            width: 1px;
+            height: 22px;
+            background: rgba(255,255,255,.35);
+            margin: 0 4px;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            transition: background .15s;
+            white-space: nowrap;
+        }
+        .nav-link:hover { background: rgba(0,0,0,.15); color: #fff; }
+
+        /* ══ CONTAINER LAYOUT ══ */
+        .container {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 32px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            flex: 1;
+        }
+
+        .container h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1f3a5d;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .info-box {
+            background: var(--green-light);
+            border-left: 4px solid var(--green);
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--green-dark);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        /* Đồng bộ input của Django form */
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+            color: var(--dark);
+            background-color: #fff;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        input[readonly] {
+            background: var(--gray-bg);
+            cursor: not-allowed;
+            color: var(--muted);
+        }
+
+        select[multiple] {
+            min-height: 120px;
+        }
+
+        /* Error Styles */
+        .errorlist {
+            background: #ffebee;
+            border: 1px solid #ef5350;
+            color: #c62828;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            list-style: none;
+            margin-top: 6px;
+        }
+
+        .errorlist li {
+            margin: 2px 0;
+        }
+
+        /* Buttons Layout */
+        .form-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        button[type="submit"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            background: var(--green-dark);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.15s;
+        }
+
+        button[type="submit"]:hover {
+            background: var(--green);
+            transform: translateY(-1px);
+        }
+
+        .back-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            background: var(--dark);
+            color: #fff !important;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            transition: background 0.15s, transform 0.15s;
+        }
+
+        .back-btn:hover {
+            background: #1e2029;
+            transform: translateY(-1px);
+        }
+
+        /* ══ FOOTER MÀU ĐEN NHẠT QUY CHUẨN ══ */
+        footer {
+            background: var(--dark);
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #bbb;
+            margin-top: auto;
+        }
+        footer a {
+            color: var(--green);
+            text-decoration: none;
+            font-weight: 700;
+        }
+        footer a:hover {
+            color: var(--green-dark);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .navbar { padding: 0 16px; }
+            .container { padding: 20px; margin: 20px auto; }
+            .form-buttons { flex-direction: column; }
+            button[type="submit"], .back-btn { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <a class="nav-logo" href="/blog">PTIT<span>Share</span></a>
+    <div class="nav-dropdown">
+        <div class="nav-dropdown-btn">Khám phá ▾</div>
+        <div class="nav-dropdown-menu">
+            <a href="/blog">Blog</a>
+            <a href="/exam">Exam</a>
+            <a href="/practice">Practice</a>
+        </div>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-divider"></div>
+    <a href="/blog/users/this-user" class="nav-link">Trang cá nhân</a>
+    <a href="/blog/users/rank" class="nav-link">Xếp hạng</a>
+    <a href="/blog/logout" class="nav-link">Đăng xuất</a>
+</nav>
+
+<div class="container">
+    <h1><%= article ? '✏️ Chỉnh sửa bài viết' : '✏️ Tạo bài viết mới' %></h1>
+
+    <div class="info-box">
+        💡 Chia sẻ suy nghĩ, ý tưởng hoặc kinh nghiệm của bạn với cộng đồng.
+    </div>
+
+    <form method="post" action="<%= article ? '/blog/articles/' + article.id + '/edit' : '/blog/articles/new' %>">
+        <div class="form-group">
+            <label for="title">Tiêu đề bài viết</label>
+            <input type="text" name="title" id="title" required
+                   value="<%= article ? article.title : '' %>">
+        </div>
+
+        <div class="form-group">
+            <label for="content">Nội dung</label>
+            <textarea name="content" id="content" rows="12" required><%= article ? article.content : '' %></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="topic">Chủ đề (giữ Ctrl để chọn nhiều)</label>
+            <select name="topic" id="topic" multiple>
+                <% (topics || []).forEach(function(t) { %>
+                    <option value="<%= t.id %>"
+                        <%= (selectedTopics || []).includes(t.id) ? 'selected' : '' %>>
+                        <%= t.name %>
+                    </option>
+                <% }) %>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tác giả</label>
+            <input type="text" value="👤 <%= currentUser ? currentUser.name : '' %>" readonly>
+        </div>
+
+        <div class="form-buttons">
+            <button type="submit">🚀 <%= article ? 'Cập nhật' : 'Đăng bài viết' %></button>
+            <a href="/blog" class="back-btn">← Quay lại</a>
+        </div>
+    </form>
+</div>
+
+<footer>
+    &copy; 2026 PTITShare &mdash; Powered by <a href="#">Express</a>
+</footer>
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tìm kiếm bài kiểm tra – PTITShare</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        :root {
+            --green:       #04AA6D;
+            --green-dark:  #059862;
+            --green-light: #e8f8f2;
+            --dark:        #282A35;
+            --gray-bg:     #f6f6f6;
+            --border:      #e0e0e0;
+            --muted:       #6c757d;
+            --blue-btn:    #2196F3;
+            --orange-btn:  #ff9800;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            /* Đã chuyển hoàn toàn về phông chữ mặc định của hệ thống */
+            font-family: var(--bs-body-font-family);
+            background: var(--gray-bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+                
+        /* ══ PHÂN TRANG (PAGINATION) ══ */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .pagination a {
+            background: var(--green-dark);
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background 0.15s;
+        }
+
+        .pagination a:hover {
+            background: var(--green);
+        }
+
+        .pagination span {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+
+        .topic-tag {
+            display: inline-block;
+            background: var(--green-light);
+            color: var(--green-dark);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 6px;
+            margin-top: 4px;
+        }
+
+        /* ══ NAVBAR ══ */
+        .navbar {
+            background: var(--green);
+            height: 52px;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        }
+        .nav-logo {
+            font-size: 19px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+            letter-spacing: -.5px;
+            white-space: nowrap;
+        }
+        .nav-logo span { color: var(--dark); }
+
+        .nav-dropdown { position: relative; }
+        .nav-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s;
+        }
+        .nav-dropdown-btn:hover,
+        .nav-dropdown:hover .nav-dropdown-btn { background: rgba(0,0,0,.15); }
+        .nav-dropdown-btn svg { transition: transform .2s; }
+        .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+
+        .nav-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--dark);
+            border-radius: 0 0 6px 6px;
+            min-width: 140px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.3);
+            z-index: 200;
+        }
+        .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+        .nav-dropdown-menu a {
+            display: block;
+            color: #ccc;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 10px 18px;
+            transition: background .12s, color .12s;
+        }
+        .nav-dropdown-menu a:hover { background: var(--green); color: #fff; }
+
+        .nav-spacer { flex: 1; }
+        .nav-divider {
+            width: 1px;
+            height: 22px;
+            background: rgba(255,255,255,.35);
+            margin: 0 4px;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            transition: background .15s;
+            white-space: nowrap;
+        }
+        .nav-link:hover { background: rgba(0,0,0,.15); color: #fff; }
+
+        /* ══ CONTAINER LAYOUT ══ */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 24px;
+            flex: 1;
+        }
+
+        h1 {
+            color: #1f3a5d;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            text-align: center; /* Đưa thẳng căn giữa vào CSS */
+        }
+
+        /* ══ KHỐI THAO TÁC QUẢN LÝ ══ */
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+            white-space: nowrap;
+        }
+        .btn-action:active {
+            transform: scale(0.98);
+        }
+
+        /* ══ SEARCH BAR FORM ══ */
+        .search-form {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-form input[type="text"] {
+            flex: 1;
+            min-width: 240px;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14.5px;
+            font-weight: 600;
+            transition: border-color 0.2s;
+        }
+
+        .search-form input[type="text"]:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        /* Định dạng chung cho các nút trong form */
+        .btn-nav-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+
+        /* Nút Tìm kiếm */
+        .btn-search { background: var(--green); color: white; }
+        .btn-search:hover { background: var(--green-dark); }
+
+        .btn-filter { background: var(--blue-btn); color: white; }
+        .btn-filter:hover { opacity: 0.9; }
+
+        /* Nút Bài Test của tôi */
+        .btn-my-tests { background: #3498db; color: #fff; }
+        .btn-my-tests:hover { background: #2980b9; color: #fff; }
+
+        /* Nút Tạo bài Test */
+        .btn-create { background: #ff9800; color: #fff; }
+        .btn-create:hover { background: #e68900; color: #fff; }
+
+        /* Responsive cho mobile */
+        @media (max-width: 768px) {
+            .search-form { flex-direction: column; }
+            .search-form input[type="text"] { width: 100%; }
+            .btn-nav-action { width: 100%; }
+        }
+
+        /* ══ LIST OF TESTS ══ */
+        .test-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .test-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+            transition: border-color 0.15s;
+        }
+        .test-item:hover {
+            border-color: #b3e2cd;
+        }
+
+        .test-info-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .test-title {
+            font-size: 16.5px;
+            font-weight: 800;
+            color: #1f3a5d;
+        }
+
+        .test-sub-details {
+            font-size: 13.5px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .badge-author {
+            color: var(--green-dark);
+            text-decoration: none;
+            font-weight: 700;
+            background: var(--green-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .badge-author:hover {
+            background: #d0f2e4;
+            color: var(--green-dark);
+        }
+
+        .badge-quantity {
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .btn-take-test {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--green);
+            color: #fff !important;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.15s;
+            min-width: 80px;
+            text-align: center;
+        }
+        .btn-take-test:hover {
+            background: var(--green-dark);
+        }
+
+        .no-result {
+            text-align: center;
+            padding: 40px 20px;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        /* ══ FOOTER ══ */
+        footer {
+            background: var(--dark);
+            color: #888;
+            text-align: center;
+            padding: 18px;
+            font-size: 13px;
+            margin-top: auto;
+        }
+        footer a { color: var(--green); text-decoration: none; }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0 16px; }
+            .container { padding: 0 16px; margin: 20px auto; }
+            .action-bar { flex-direction: column; gap: 8px; }
+            .btn-action { width: 100%; justify-content: center; }
+            .test-item { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .test-item div[style*="text-align: right"] { width: 100%; text-align: left !important; }
+            .btn-take-test { width: 100%; }
+        }
+
+        .search-form {
+            background: #ffffff;
+            padding: 14px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            margin-bottom: 28px;
+            
+            /* Flexbox giúp dàn hàng ngang */
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+        }
+
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <a class="nav-logo" href="/blog">PTIT<span>Share</span></a>
+    <div class="nav-dropdown">
+        <div class="nav-dropdown-btn">
+            Khám phá
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+            </svg>
+        </div>
+        <div class="nav-dropdown-menu">
+            <a href="/blog">Blog</a>
+            <a href="/exam">Exam</a>
+            <a href="/practice">Practice</a>
+        </div>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-divider"></div>
+    <a href="/blog/users/this-user" class="nav-link">Trang cá nhân</a>
+    <a href="/blog/users/rank" class="nav-link">Xếp hạng</a>
+    <a href="/blog/logout" class="nav-link">Đăng xuất</a>
+</nav>
+
+<main class="container">
+    <h1>📝 Danh sách bài kiểm tra mới nhất</h1>
+    <br>
+
+    <div class="search-section">
+        <form method="get" class="search-form" action="/blog/search">
+            <input type="text" name="keyword" value="<%= typeof query !== 'undefined' ? query : '' %>" placeholder="🔍 Tìm kiếm...">
+            <button type="submit" name="form" value="search" class="btn-action btn-search">Tìm kiếm</button>
+            <a href="/blog/filter" class="btn-action btn-filter">Lọc chủ đề</a>
+            <a href="/exam/create" class="btn-action btn-create">✏️ Tạo Test</a>
+        </form>
+    </div>
+
+    <% if (tests && tests.length) { %>
+        <ul class="test-list">
+            <% tests.forEach(function(test) { %>
+                <li class="test-item">
+                    <div class="test-info-meta">
+                        <a class="test-title" style="text-decoration: none; color: inherit; display: block;"
+                           href="/exam/test/<%= test.id %>">
+                            <%= test.title %>
+                        </a>
+                        <div class="test-sub-details">
+                            Tác giả: <a href="/blog/users/<%= test.author.id %>"><%= test.author.username %></a>
+                            &bull; <span class="badge-quantity"><%= test.quantity %> câu hỏi</span>
+                        </div>
+                        <% if (test.topics && test.topics.length) { %>
+                            <div class="post-topics">
+                                <% test.topics.forEach(function(topic) { %>
+                                    <a class="topic-tag" style="text-decoration: none;"
+                                       href="/blog/filter?topics=<%= topic.id %>"><%= topic.name %></a>
+                                <% }) %>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div style="text-align: right;">
+                        <a href="/exam/take/<%= test.id %>" class="btn-take-test">Làm bài</a>
+                    </div>
+                </li>
+            <% }) %>
+        </ul>
+    <% } else { %>
+        <div class="no-result"><p>Chưa có bài test nào.</p></div>
+    <% } %>
+
+    <div class="pagination">
+        <% if (page > 1) { %>
+            <a href="?page=<%= page - 1 %>">← Trang trước</a>
+        <% } %>
+        <span>Trang <%= page %>/<%= totalPages || 1 %></span>
+        <% if (page < totalPages) { %>
+            <a href="?page=<%= page + 1 %>">Trang sau →</a>
+        <% } %>
+    </div>
+</main>
+
+<footer>
+    &copy; 2026 PTITShare &mdash; Powered by <a href="#">Express</a>
+</footer>
+</body>
+</html>

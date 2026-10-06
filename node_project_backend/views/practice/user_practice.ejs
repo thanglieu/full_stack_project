@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách người làm bài kiểm tra – PTITShare</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        :root {
+            --green:       #04AA6D;
+            --green-dark:  #059862;
+            --green-light: #e8f8f2;
+            --dark:        #282A35;
+            --gray-bg:     #f6f6f6;
+            --border:      #e0e0e0;
+            --muted:       #6c757d;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--gray-bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══ NAVBAR PTITSHARE MẶC ĐỊNH ══ */
+        .navbar {
+            background: var(--green);
+            height: 52px;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        }
+        .nav-logo {
+            font-size: 19px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+            letter-spacing: -.5px;
+            white-space: nowrap;
+        }
+        .nav-logo span { color: var(--dark); }
+
+        .nav-dropdown { position: relative; }
+        .nav-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s;
+        }
+        .nav-dropdown-btn:hover,
+        .nav-dropdown:hover .nav-dropdown-btn { background: rgba(0,0,0,.15); }
+        .nav-dropdown-btn svg { transition: transform .2s; }
+        .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+
+        .nav-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--dark);
+            border-radius: 0 0 6px 6px;
+            min-width: 140px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.3);
+            z-index: 200;
+        }
+        .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+        .nav-dropdown-menu a {
+            display: block;
+            color: #ccc;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 10px 18px;
+            transition: background .12s, color .12s;
+        }
+        .nav-dropdown-menu a:hover { background: var(--green); color: #fff; }
+
+        .nav-spacer { flex: 1; }
+        .nav-divider {
+            width: 1px;
+            height: 22px;
+            background: rgba(255,255,255,.35);
+            margin: 0 4px;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            transition: background .15s;
+            white-space: nowrap;
+        }
+        .nav-link:hover { background: rgba(0,0,0,.15); color: #fff; }
+
+        /* Topics */
+        .topic-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .topic-tag {
+            display: inline-block;
+            background: var(--green);
+            color: white !important;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        .topic-tag:hover {
+            background: var(--green-dark);
+        }
+
+        /* ══ CONTAINER LAYOUT ══ */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 24px;
+            flex: 1;
+        }
+
+        h1 {
+            color: #1f3a5d;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 14px;
+            margin-top: 28px;
+        }
+
+        /* ══ KHỐI THÔNG TIN BÀI VIẾT ══ */
+        .info-card {
+            background: #ffffff;
+            padding: 20px 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            margin-bottom: 24px;
+        }
+        .info-card p {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .info-card p:last-child {
+            margin-bottom: 0;
+        }
+        .info-card strong {
+            color: #1f3a5d;
+        }
+
+        /* ══ BẢNG DANH SÁCH NGƯỜI LÀM ══ */
+        .table-responsive {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14.5px;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #1f3a5d;
+            font-weight: 700;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        td a {
+            color: var(--green-dark);
+            text-decoration: none;
+            font-weight: 700;
+        }
+        td a:hover {
+            color: var(--green);
+            text-decoration: underline;
+        }
+
+        .score-cell {
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* Trạng thái trống */
+        .no-results {
+            padding: 32px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        /* ══ BUTTON NỀN TẢNG ══ */
+        .action-container {
+            margin-top: 28px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14.5px;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            background: var(--green);
+            color: #fff !important;
+            transition: background .15s;
+        }
+        .back-btn:hover {
+            background: var(--green-dark);
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0 16px; }
+            .container { padding: 0 16px; margin: 20px auto; }
+            th, td { padding: 10px 12px; font-size: 13.5px; }
+            .back-btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <a class="nav-logo" href="/blog">PTIT<span>Share</span></a>
+    <div class="nav-dropdown">
+        <div class="nav-dropdown-btn">Khám phá ▾</div>
+        <div class="nav-dropdown-menu">
+            <a href="/blog">Blog</a>
+            <a href="/exam">Exam</a>
+            <a href="/practice">Practice</a>
+        </div>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-divider"></div>
+    <a href="/blog/users/this-user" class="nav-link">Trang cá nhân</a>
+    <a href="/blog/users/rank" class="nav-link">Xếp hạng</a>
+    <a href="/blog/logout" class="nav-link">Đăng xuất</a>
+</nav>
+
+<main class="container">
+    <h1>📝 Practice: <%= practice.title %></h1>
+
+    <h2>Thông tin bài</h2>
+    <div class="info-card">
+        <p><strong>Người tạo:</strong> <%= practice.author.username %></p>
+        <p><strong>Nội dung:</strong><br><%= practice.content %></p>
+        <p><strong>Số người đã làm:</strong> <%= (user_practices && user_practices.length) || 0 %></p>
+        <p><strong>Chủ đề:</strong></p>
+        <% if (practice.topics && practice.topics.length) { %>
+            <div class="topic-list">
+                <% practice.topics.forEach(function(topic) { %>
+                    <a href="/blog/filter?topics=<%= topic.id %>" class="topic-tag"><%= topic.name %></a>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+
+    <h2>Danh sách người làm</h2>
+    <% if (user_practices && user_practices.length) { %>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Người làm</th>
+                        <th>Điểm</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% user_practices.forEach(function(item, index) { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= item.user.username %></td>
+                            <td class="score-cell"><%= item.mark %></td>
+                            <td>
+                                <a href="/practice/user_practice/<%= practice.id %>/<%= item.user.id %>">Xem chi tiết</a>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    <% } else { %>
+        <div class="no-results"><p>Chưa có ai hoàn thành bài này.</p></div>
+    <% } %>
+
+    <div class="action-container">
+        <a href="/blog/users/<%= practice.author.id %>" class="back-btn">Quay lại</a>
+        <a href="/practice/<%= practice.id %>/take" class="back-btn">Làm</a>
+    </div>
+</main>
+
+<footer>&copy; 2026 PTITShare &mdash; Powered by Express</footer>
+</body>
+</html>

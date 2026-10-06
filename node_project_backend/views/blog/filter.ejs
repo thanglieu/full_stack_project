@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lọc bài viết - Blog – PTITShare</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
+        :root {
+            --green:       #04AA6D;
+            --green-dark:  #059862;
+            --green-light: #e8f8f2;
+            --dark:        #282A35;
+            --gray-bg:     #f6f6f6;
+            --border:      #e0e0e0;
+            --muted:       #6c757d;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--bs-body-font-family);
+            background: var(--gray-bg);
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ══ NAVBAR PTITSHARE MẶC ĐỊNH ══ */
+        .navbar {
+            background: var(--green);
+            height: 52px;
+            display: flex;
+            align-items: center;
+            padding: 0 32px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,.2);
+        }
+        .nav-logo {
+            font-size: 19px;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+            letter-spacing: -.5px;
+            white-space: nowrap;
+        }
+        .nav-logo span { color: var(--dark); }
+
+        .nav-dropdown { position: relative; }
+        .nav-dropdown-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #fff;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s;
+        }
+        .nav-dropdown-btn:hover,
+        .nav-dropdown:hover .nav-dropdown-btn { background: rgba(0,0,0,.15); }
+        .nav-dropdown-btn svg { transition: transform .2s; }
+        .nav-dropdown:hover .nav-dropdown-btn svg { transform: rotate(180deg); }
+
+        .nav-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--dark);
+            border-radius: 0 0 6px 6px;
+            min-width: 140px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.3);
+            z-index: 200;
+        }
+        .nav-dropdown:hover .nav-dropdown-menu { display: block; }
+        .nav-dropdown-menu a {
+            display: block;
+            color: #ccc;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 10px 18px;
+            transition: background .12s, color .12s;
+        }
+        .nav-dropdown-menu a:hover { background: var(--green); color: #fff; }
+
+        .nav-spacer { flex: 1; }
+        .nav-divider {
+            width: 1px;
+            height: 22px;
+            background: rgba(255,255,255,.35);
+            margin: 0 4px;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            padding: 0 14px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            transition: background .15s;
+            white-space: nowrap;
+        }
+        .nav-link:hover { background: rgba(0,0,0,.15); color: #fff; }
+
+        /* ══ CONTAINER LAYOUT (TỐI ƯU DIỆN TÍCH) ══ */
+        .container {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: auto 1fr; /* Sidebar tự động theo chiều rộng bên dưới, Content chiếm hết phần còn lại */
+            gap: 24px;
+            flex: 1;
+        }
+
+        /* ══ PHÂN TRANG ĐỒNG BỘ ══ */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            background: var(--green-dark);
+            color: white !important;
+            padding: 6px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 700;
+            transition: background 0.15s;
+        }
+
+
+        .pagination a:hover {
+            background: var(--green);
+        }
+
+        .pagination span {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        /* ══ SIDEBAR CHỦ ĐỀ THU GỌN ══ */
+        .sidebar {
+            background: white;
+            padding: 18px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            width: 200px; /* Thu hẹp từ 260px xuống còn 200px */
+            height: fit-content;
+            position: sticky;
+            top: 84px;
+        }
+
+        .sidebar h2 {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--green);
+        }
+
+        .topic-group {
+            margin-bottom: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .topic-group label {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-bottom: 6px;
+        }
+
+        .topic-group label:hover {
+            background: var(--green-light);
+        }
+
+        .topic-group input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+            width: 15px;
+            height: 15px;
+            accent-color: var(--green);
+        }
+
+        .topic-group span {
+            color: var(--dark);
+            font-size: 13.5px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* Nếu chữ dài quá sẽ tự động có dấu ... */
+            flex: 1;
+        }
+
+        .sidebar-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: 700;
+            transition: background 0.15s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-submit {
+            background: var(--green);
+            color: white;
+        }
+        .btn-submit:hover {
+            background: var(--green-dark);
+        }
+
+        .btn-back {
+            background: var(--green-dark);
+            color: white !important;
+        }
+        .btn-back:hover {
+            background: var(--green);
+        }
+
+        /* ══ KHU VỰC NỘI DUNG RỘNG HƠN ══ */
+        .content {
+            background: white;
+            padding: 28px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .content h2 {
+            font-size: 19px;
+            font-weight: 800;
+            color: #1f3a5d;
+            margin: 0 0 20px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--green);
+            display: inline-block;
+        }
+
+        .articles-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            
+        }
+
+        .article-card {
+            display: block;
+            padding: 18px 22px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--green);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--dark) !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: -5px; /* tạo khoảng cách giữa các div */
+        }
+
+        .article-card h3 {
+            margin: 0 0 6px 0;
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .article-card h3 a {
+            text-decoration: none;
+            color: #1f3a5d;
+            transition: color 0.15s;
+        }   
+        
+        .article-card h3 a:hover {
+            color: var(--green-dark);
+        }    
+
+        .article-meta {
+            color: var(--muted);
+            font-size: 13.5px;
+            font-weight: 600;
+            
+        }
+
+        .article-meta span {
+            margin-right: 16px;
+        }
+
+        /* Trạng thái trống */
+        .empty-state {
+            text-align: center;
+            padding: 48px 16px;
+            color: var(--muted);
+        }
+        .empty-state p {
+            font-size: 15px;
+            font-weight: 600;
+            margin: 6px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .navbar { padding: 0 16px; }
+            .container { grid-template-columns: 1fr; margin: 20px auto; padding: 0 16px; }
+            .sidebar { position: static; width: 100%; }
+            .sidebar-buttons { flex-direction: row; }
+            .sidebar-buttons .btn-action { flex: 1; }
+        }
+
+        @media (max-width: 600px) {
+            .content { padding: 20px; }
+            .article-card { padding: 16px; }
+            .article-card h3 { font-size: 16px; }
+            .sidebar-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="nav-logo" href="#">PTIT<span>Share</span></a>
+    <div class="nav-dropdown">
+        <div class="nav-dropdown-btn">
+            Khám phá
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+            </svg>
+        </div>
+        <div class="nav-dropdown-menu">
+            <a href="{% url 'blog:home' %}">Blog</a>
+            <a href="{% url 'exam:exam_home' %}">Exam</a>
+            <a href="{% url 'practice:practice_list' %}">Practice</a>
+        </div>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-divider"></div>
+    <a href="{% url 'blog:this_user' %}" class="nav-link">Trang cá nhân</a>
+    <a href="{% url 'blog:user-list' %}" class="nav-link">Xếp hạng</a>
+    <a href="{% url 'blog:logout' %}" class="nav-link">Đăng xuất</a>
+</nav>
+
+<div class="container">
+    <aside class="sidebar">
+        <h2>Chủ đề</h2>
+        <form method="get" action="">
+            <div class="topic-group">
+                {% for topic in topics %}
+                    <label>
+                        <input type="checkbox" name="topics" value="{{ topic.id }}"
+                               {% if topic.id|stringformat:"s" in selected_topics %}checked{% endif %}>
+                        <span>{{ topic.name }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+
+            <div class="sidebar-buttons">
+                <button type="submit" class="btn-action btn-submit">🔍 Lọc bài</button>
+                <a href="{% url 'blog:home' %}" class="btn-action btn-back">← Quay lại</a>
+            </div>
+        </form>
+    </aside>
+
+    <main class="content">
+        <h2>📚 Kết quả lọc theo chủ đề</h2>
+
+        <div style="margin-bottom: 20px;">
+            <select id="resultTypeSelector" onchange="showResult()" style="padding: 10px; border-radius: 6px; border: 1px solid var(--border); width: 100%; cursor: pointer;">
+                <option value="articles">Bài viết ({{ articles.paginator.count }})</option>
+                <option value="tests">Bài kiểm tra ({{ tests.paginator.count }})</option>
+                <option value="practices">Thực hành ({{ practices.paginator.count }})</option>
+            </select>
+        </div>
+
+        
+    <!-- BLOG -->
+     <div id="articles-container" class="result-container">
+        <div class="articles-grid" >
+            {% if articles %}
+                {% for article in articles %}
+                    <div class="article-card">
+                        <h3><a href="{% url 'blog:article' article.id %}">{{ article.title }}</a></h3>
+                        <div class="article-meta">
+                            <span>✍️ <strong>{{ article.author.name }}</strong></span>
+                            <span>📅 {{ article.created_at|date:"d/m/Y" }}</span>
+                            <span>❤️ {{ article.likes.count }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>😔 Không tìm thấy bài viết nào.</p></div>
+            {% endif %}
+        </div>
+
+        <!-- phân trang -->
+        <div class="pagination">
+            {% if articles.has_previous %}
+                <a href="{{ request.get_full_path }}&page={{ articles.previous_page_number }}">← Trang trước</a>
+            {% endif %}
+
+            <span>Trang {{ articles.number }}/{{ articles.paginator.num_pages }}</span>
+
+            {% if articles.has_next %}
+                <a href="{{ request.get_full_path }}&page={{ articles.next_page_number }}">Trang sau →</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- TEST -->
+    <div id="tests-container" class="result-container" >
+        <div class="articles-grid">
+            {% if tests %}
+                {% for test in tests %}
+                    <div class="article-card">
+                        <h3><a href="{% url 'exam:user_test' test.id %}">{{ test.title }}</a></h3>
+                        <div class="article-meta">👤 {{ test.author.username }} • 📝 {{ test.quantity }} câu hỏi</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>😔 Không tìm thấy bài kiểm tra nào.</p></div>
+            {% endif %}
+        </div>
+
+        <div class="pagination">
+            {% if tests.has_previous %}
+                <a href="{{ request.get_full_path }}&page={{ tests.previous_page_number }}">← Trang trước</a>
+            {% endif %}
+
+            <span>Trang {{ tests.number }}/{{ tests.paginator.num_pages }}</span>
+
+            {% if tests.has_next %}
+                <a href="{{ request.get_full_path }}&page={{ tests.next_page_number }}">Trang sau →</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- PRACTICE -->
+     <div id="practices-container" class="result-container">
+        <div class="articles-grid">
+            {% if practices %}
+                {% for p in practices %}
+                    <div class="article-card">
+                        <h3><a href="{% url 'practice:user_practice_list' p.id %}">{{ p.title }}</a></h3>
+                        <div class="article-meta">👤 {{ p.author }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state"><p>😔 Không tìm thấy bài thực hành nào.</p></div>
+            {% endif %}
+        </div>
+
+        <div class="pagination">
+            {% if practices.has_previous %}
+                <a href="{{ request.get_full_path }}&page={{ practices.previous_page_number }}">← Trang trước</a>
+            {% endif %}
+
+            <span>Trang {{ practices.number }}/{{ practices.paginator.num_pages }}</span>
+
+            {% if practices.has_next %}
+                <a href="{{ request.get_full_path }}&page={{ practices.next_page_number }}">Trang sau →</a>
+            {% endif %}
+        </div>
+    </div>
+
+
+    </main>
+</div>
+
+
+<script>
+    function showResult() {
+        var selectedValue = document.getElementById("resultTypeSelector").value;
+        var containers = document.getElementsByClassName("result-container");
+        
+        // ẩn tất cả <div>
+        for (var i = 0; i < containers.length; i++) {
+            containers[i].style.display = "none";
+        }
+        
+        // hiển thị <div> được chọn
+        document.getElementById(selectedValue + "-container").style.display = "block";
+    }
+
+    // Chạy mặc định khi load trang
+    window.onload = showResult;
+</script>
+
+</body>
+</html>

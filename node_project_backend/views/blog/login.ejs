@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập - Blog</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-header .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .login-header h2 {
+      font-size: 28px;
+      color: #2c3e50;
+      margin: 0;
+    }
+
+    .login-header p {
+      color: #7f8c8d;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+
+    form p {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.3s;
+      font-family: inherit;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+    }
+
+    input[type="password"],
+    input[type="text"] {
+      display: block;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76,175,80,0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .register-link {
+      text-align: center;
+      margin-top: 25px;
+      padding-top: 25px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .register-link p {
+      margin: 0;
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+
+    .register-link a {
+      color: #4CAF50;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .register-link a:hover {
+      color: #45a049;
+      text-decoration: underline;
+    }
+
+    .error-message {
+      background: #ffebee;
+      border: 1px solid #ef5350;
+      color: #c62828;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .form-note {
+      color: #999;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        padding: 30px 20px;
+      }
+
+      .login-header h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <div class="logo">📖</div>
+      <h2>Đăng nhập</h2>
+      <p>Tham gia cộng đồng Blog của chúng tôi</p>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="error-message"><%= error %></div>
+    <% } %>
+
+    <form method="post" action="/blog/login">
+      <p>
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" name="username" id="username" required>
+      </p>
+      <p>
+        <label for="password">Mật khẩu</label>
+        <input type="password" name="password" id="password" required>
+      </p>
+      <button type="submit">🔓 Đăng nhập</button>
+    </form>
+
+    <div class="register-link">
+      <p>Bạn chưa có tài khoản? <a href="/blog/register">Đăng ký ngay</a></p>
+    </div>
+  </div>
+</body>
+</html>
